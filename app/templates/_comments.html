@@ -1,0 +1,15 @@
+<!-- _comments.html -->
+{% for comment in comments %}
+<div class="comment">
+    <div class="comment-author">
+        <img src="{{ url_for('static', filename='uploads/' + comment.author.profile_photo) }}" class="comment-author-photo">
+        <span style="font-size:xx-large;" >{{ comment.author.username }}</span>
+    </div>
+    <div class="comment-body">
+        <p>{{ comment.body }}</p>
+    </div>
+    <div class="comment-timestamp">
+        <small>{{ comment.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</small>
+    </div>
+</div>
+{% endfor %}

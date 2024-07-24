@@ -1,0 +1,51 @@
+{% import '_macros.html' as macros %}
+<ul class="posts">
+    {% for post in posts %}
+    <li class="post">
+        <div class="profile-thumbnail">
+            <a href="{{ url_for('.user', username=post.author.username) }}">
+                <img src="{{ url_for('static', filename='uploads/' + (post.author.profile_photo or 'default.jpg')) }}" alt="{{ post.author.username }}" class="img-thumbnail profile-photo" style="cursor: pointer;">
+            </a>
+        </div>
+        <div class="post-author">
+            <a href="{{ url_for('.user', username=post.author.username) }}" style="color: rgb(11, 233, 222);">
+                {{ post.author.username }}
+            </a>
+        </div>
+        <div class="post-body">
+            {% if post.body_html %}
+            {{ post.body_html | safe }}
+            {% else %}
+            {{ post.body }}
+            {% endif %}
+            <div class="post-footer container mt-3">
+                <div class="d-flex justify-content-between align-items-center">
+                    <a href="{{ url_for('.post', id=post.id) }}">
+                        <span class="label label-default box p-2 border rounded"><i>Share post</i></span>
+                    </a>
+                    <a href="{{ url_for('.post', id=post.id) }}#comments">
+                        <span class="label label-primary box p-2 border rounded">
+                        Comments {{ post.comments.count() }}
+                        </span>
+                       </a>
+                    {% if current_user == post.author %}
+                    <a href="{{ url_for('.edit', id=post.id) }}">
+                        <span class="label label-primary box p-2 border rounded"><i> <b>Edit</b></i></span>
+                    </a>
+                    {% elif current_user.is_administrator() %}
+                        <a href="{{ url_for('.edit', id=post.id) }}">
+                            <span class="label label-danger box p-2 border rounded"><i><b>Edit [Admin]</b></i></span>
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="post-date" data-timestamp="{{ post.timestamp.isoformat() }}"></div>
+        <!-- Include comments for this post -->
+        <div class="post-comments">
+            {% include '_comments.html'%}
+        </div>
+        <!-- Call pagination macro for comments -->
+    </li>
+    {% endfor %}
+</ul>

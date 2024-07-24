@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+{% import "_macros.html" as macros %}
+
+{% block title %}Posts{% endblock %}
+
+
+{% block page_content %}
+<div>
+    {% if current_user.can(Permission.WRITE) %}
+    {{ wtf.quick_form(form) }}
+    {% endif %}
+</div>
+{% include '_posts.html' %}
+<div class="pagination">
+ {{ macros.pagination_widget(pagination, '.index') }}
+</div>
+
+{% block scripts %}
+{{ super() }}
+{{ pagedown.include_pagedown() }}
+<script src="{{ url_for('static', filename='js/scripts.js') }}"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.34/moment-timezone-with-data.min.js"></script>
+{% endblock %}
+{% endblock %}

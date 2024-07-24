@@ -1,0 +1,8 @@
+Hi {{ user.username }},
+
+Thank you for registering to Appie! Please confirm your email address by clicking the link below:
+
+{{ url_for('auth.confirm', token=token, _external=True) }}
+
+If you did not make this request then simply ignore this email and no changes will be made.
+Note: replies to this email address are not monitored

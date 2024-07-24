@@ -1,0 +1,15 @@
+<!doctype html>
+<html>
+<head>
+    <title>Confirm Your Account</title>
+</head>
+<body>
+    <p>Hi {{ user.username }},</p>
+    <p><strong>You have not confirmed your account yet</strong></p>
+    <p>Please check your mail inbox to confirm your account before you can access this site</p>
+    <p>we have sent you a confirmation email</p>
+    <p>Need another confirmation email<a href="{{ url_for('auth.confirm', token=token, _external=True) }}"><i>Click here</i></a></p>
+    <p>If you did not make this request then simply ignore this email and no changes will be made.</p>
+</body>
+</html>
+

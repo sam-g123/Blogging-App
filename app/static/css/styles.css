@@ -1,0 +1,90 @@
+.custom-btn {
+    background-color: #113d6b;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.custom-btn:hover {
+    color: white;
+    background-color: #1e5ea7;
+}
+.profile-photo {
+width: 150px; /* Set the width */
+height: 150px; /* Set the height */
+object-fit: cover; /* Ensures the image covers the area without distortion */
+border-radius: 50%; /* Makes the image circular */
+}
+.comment-author-photo{
+width: 120px; /* Set the width */
+height: 120px; /* Set the height */
+object-fit: cover; /* Ensures the image covers the area without distortion */
+border-radius: 50%; /* Makes the image circular */
+
+}
+.login{
+margin-top: 20px;
+}
+.home{
+margin-bottom: 100px;
+}
+.post-date{
+font-style: italic;
+font-weight:lighter;
+font-size: smaller;
+margin-left: 20px;
+margin-top: 10px;
+
+}
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    padding: 10px 0;
+    list-style: none;
+}
+
+.pagination > li {
+    display: inline;
+    margin: 0 5px;
+}
+
+.pagination > li > a {
+    text-decoration: none;
+    color: #0056b3;
+    padding: 5px 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.pagination > li > a:hover {
+    background-color: #ddd;
+}
+
+.pagination > li.active > a {
+    background-color: #007bff;
+    color: white;
+    border-color: #007bff;
+}
+
+.pagination > li.disabled > a {
+    color: #999;
+    pointer-events: none;
+    background-color: #fff;
+}
+
+.box {
+    display: inline-block;
+    margin-right: 10px;
+    background-color: #f8f9fa;
+    }
+.box a, .box span {
+    text-decoration: none;
+    color: #007bff;
+    }
+.box a:hover, .box span:hover {
+    color: #0056b3;
+    }

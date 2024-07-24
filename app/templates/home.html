@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    {% block head %}
+    <title>{% block title %} {% endblock %} Hello</title>
+    {% endblock %}
+
+</head>
+{% import "bootstrap/wtf.html" as wtf %}
+
+<body>
+
+    {% block body %}
+
+    <div class="container">
+        {% for message in get_flashed_messages() %}
+        <div class="alert alert-warning">
+        <button type="button" class="close" data-dismiss="alert">&times;</button>
+        {{ message }}
+        </div>
+        {% endfor %}
+
+    <div class="page_header">
+        <h1>Hello, {% if name %}{{ name }} {% else %} Stranger {% endif %} !</h1>
+    </div>
+    {{ wtf.quick_form(form)}}
+
+    {% endblock %}
+    
+</body>
+</html>
