@@ -7,6 +7,8 @@ from config import config
 from flask_login import LoginManager
 from flask_session import Session
 from flask_pagedown import PageDown
+from flask_talisman import Talisman
+from werkzeug.middleware.proxy_fix import ProxyFix
 
 login_manager = LoginManager()
 login_manager.login_view = 'auth.login'
@@ -30,6 +32,10 @@ def create_app(config_name):
     pagedown.init_app(app)
     app.config['SESSION_TYPE'] = 'filesystem'
     Session(app)
+    app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_port=1, x_prefix=1)
+
+    if config_name == 'production':
+        Talisman(app, content_security_policy=None)
     
     # attach routes and custom error pages here
     from .main import main as main_blueprint

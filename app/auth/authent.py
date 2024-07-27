@@ -5,7 +5,6 @@ from google_auth_oauthlib.flow import Flow
 import google.oauth2.credentials
 from . import auth
 
-os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1' # This line should be removed if using HTTPS
 
 @auth.route('/authorize')
 def authorize():
