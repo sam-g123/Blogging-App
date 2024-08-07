@@ -1,9 +1,11 @@
 import unittest
+from unittest.mock import patch, MagicMock
+import re
 from app import create_app, db
-from app.models import User, Role
+from app.models import Role, User
+from app.emails import get_credentials
 
 class FlaskClientTestCase(unittest.TestCase):
-
     def setUp(self):
         self.app = create_app('testing')
         self.app_context = self.app.app_context()
@@ -15,50 +17,86 @@ class FlaskClientTestCase(unittest.TestCase):
         db.session.add(user)
         db.session.commit()
 
-
     def tearDown(self):
         db.session.remove()
         db.drop_all()
         self.app_context.pop()
+
     def test_home_page(self):
         response = self.client.get('/')
         self.assertEqual(response.status_code, 200)
-        self.assertTrue('Stranger' in response.get_data(as_text=True))
+        self.assertIn('Posts', response.get_data(as_text=True))
 
-    def test_register_and_login(self):
-        # register a new account
-        response = self.client.post('/auth/register', data={
-            'email': 'newuser@example.com',
-            'username': 'newuser',
-            'password': 'password',
-            'password2': 'password'
-        })
-        self.assertEqual(response.status_code, 302)
-        # log in with the new account
-        response = self.client.post('/auth/login', data={
-            'email': 'newuser@example.com',
+@patch('app.emails.get_credentials')
+def test_register(self, MockGetCredentials):
+    mock_credentials = MagicMock()
+    mock_credentials.universe_domain = 'googleapis.com'
+    mock_credentials.create_scoped.side_effect = lambda scopes: mock_credentials
+    mock_credentials.authorize.side_effect = lambda: mock_credentials
+    MockGetCredentials.return_value = mock_credentials
+    response = self.client.post('/register', data={
+        'email': 'newuser@example.com',
+        'username': 'newuser',
+        'password': 'password',
+        'password2': 'password'
+    })
+    self.assertEqual(response.status_code, 302)
+    user = User.query.filter_by(email='newuser@example.com').first()
+    self.assertIsNotNone(user)
+
+@patch('app.emails.get_credentials') 
+def test_account_confirmation(self, MockGetCredentials):
+    mock_credentials = MagicMock()
+    mock_credentials.universe_domain = 'googleapis.com'
+    mock_credentials.create_scoped.side_effect = lambda scopes: mock_credentials
+    mock_credentials.authorize.side_effect = lambda: mock_credentials
+    MockGetCredentials.return_value = mock_credentials
+
+    response = self.client.post('/register', data={
+        'email': 'newuser@example.com',
+        'username': 'newuser',
+        'password': 'password',
+        'password2': 'password'
+    })
+    self.assertEqual(response.status_code, 302)
+
+    user = User.query.filter_by(email='newuser@example.com').first()
+    self.assertIsNotNone(user)
+
+    token = user.generate_confirmation_token()
+
+    response = self.client.get(f'/confirm/{token}', follow_redirects=True)
+    self.assertEqual(response.status_code, 200)
+    self.assertIn('You have confirmed your account', response.get_data(as_text=True))
+    self.assertTrue(user.confirmed)
+
+    @patch('app.emails.get_credentials')
+    def test_login(self, MockGetCredentials):
+        mock_credentials = MagicMock()
+        mock_credentials.universe_domain = 'googleapis.com'
+
+        mock_credentials.create_scoped.side_effect = lambda scopes: mock_credentials
+        mock_credentials.authorize.side_effect = lambda: mock_credentials
+
+        MockGetCredentials.return_value = mock_credentials
+
+        response = self.client.post('/login', data={
+            'email': 'user@example.com',
             'password': 'password'
         }, follow_redirects=True)
         self.assertEqual(response.status_code, 200)
-        self.assertTrue(re.search('Hello,newuser!',
-                                response.get_data(as_text=True)))
-        self.assertTrue(
-            'You have not confirmed your account yet' in response.get_data(
-                as_text=True))
+        self.assertTrue(re.search('Hello, john!', response.get_data(as_text=True)))
 
-        # send a confirmation token
-        user = User.query.filter_by(email='newuser@example.com').first()
-        token = user.generate_confirmation_token()
-        response = self.client.get('/auth/confirm/{}'.format(token),
-                                    follow_redirects=True)
-        user.confirm(token)
+    @patch('app.emails.get_credentials')
+    def test_logout(self, MockGetCredentials):
+        mock_credentials = MagicMock()
+        mock_credentials.universe_domain = 'googleapis.com'
+
+        mock_credentials.create_scoped.side_effect = lambda scopes: mock_credentials
+        mock_credentials.authorize.side_effect = lambda: mock_credentials
+
+        MockGetCredentials.return_value = mock_credentials
+
+        response = self.client.get('/logout', follow_redirects=True)
         self.assertEqual(response.status_code, 200)
-        self.assertTrue(
-            'You have confirmed your account' in response.get_data(
-                as_text=True))
-                
-        # log out
-        response = self.client.get('/auth/logout', follow_redirects=True)
-        self.assertEqual(response.status_code, 200)
-        self.assertTrue('You have been logged out' in response.get_data(
-            as_text=True))
+        self.assertIn('Please log in to access this page', response.get_data(as_text=True))
